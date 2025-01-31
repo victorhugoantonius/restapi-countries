@@ -1,6 +1,7 @@
 <template>
   <the-header></the-header>
-  <router-view v-slot="slotProps">
+  <base-spinner v-if="isLoading"></base-spinner>
+  <router-view v-slot="slotProps" v-else>
     <transition name="route" mode="out-in">
       <component :is="slotProps.Component"></component>
     </transition>
@@ -10,16 +11,21 @@
 <script>
 import TheHeader from "./components/layout/TheHeader.vue";
 import { useStore } from "vuex";
+import { ref } from "vue";
 export default {
   components: {
     TheHeader,
   },
   setup() {
+    const isLoading = ref(false);
     const store = useStore();
     const loadCountries = async () => {
+      isLoading.value = true;
       await store.dispatch("countries/loadCountriesFromAPI");
+      isLoading.value = false;
     };
     loadCountries();
+    return { isLoading };
   },
 };
 </script>
